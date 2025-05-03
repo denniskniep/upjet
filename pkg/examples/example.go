@@ -10,6 +10,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"sort"
 	"strings"
@@ -255,7 +256,7 @@ func transformFields(r *config.Resource, params map[string]any, omittedFields []
 				"namespace": defaultNamespace,
 				"key":       secretKey,
 			})
-		case r.References[fieldPath] != config.Reference{}:
+		case !reflect.DeepEqual(r.References[fieldPath], config.Reference{}):
 			switch v.(type) {
 			case []any:
 				l := sch.Type == schema.TypeList || sch.Type == schema.TypeSet

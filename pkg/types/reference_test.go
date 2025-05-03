@@ -38,7 +38,7 @@ func TestBuilder_generateReferenceFields(t *testing.T) {
 				f: &Field{
 					Name: name.NewFromCamel("TestField"),
 					Reference: &config.Reference{
-						Type: "testObject",
+						Types: []string{"testObject"},
 					},
 					FieldType: types.Universe.Lookup("string").Type(),
 				},
@@ -57,13 +57,38 @@ func TestBuilder_generateReferenceFields(t *testing.T) {
 				},
 			},
 		},
+		"MultipleRefType": {
+			args: args{
+				t: types.NewTypeName(token.NoPos, tp, "Params", types.Universe.Lookup("string").Type()),
+				f: &Field{
+					Name: name.NewFromCamel("TestField"),
+					Reference: &config.Reference{
+						Types: []string{"testObject1", "testObject2"},
+					},
+					FieldType: types.Universe.Lookup("string").Type(),
+				},
+			}, want: want{
+				outFields: []*types.Var{
+					types.NewField(token.NoPos, tp, "TestFieldRef", types.NewPointer(typeReferenceField), false),
+					types.NewField(token.NoPos, tp, "TestFieldSelector", types.NewPointer(typeSelectorField), false),
+				},
+				outTags: []string{
+					`json:"testFieldRef,omitempty" tf:"-"`,
+					`json:"testFieldSelector,omitempty" tf:"-"`,
+				},
+				outComments: twtypes.Comments{
+					"github.com/crossplane/upjet/pkg/types.Params:TestFieldRef":      "// Reference to a testObject1 or a testObject2 to populate testField.\n// +kubebuilder:validation:Optional\n",
+					"github.com/crossplane/upjet/pkg/types.Params:TestFieldSelector": "// Selector for a testObject1 or a testObject2 to populate testField.\n// +kubebuilder:validation:Optional\n",
+				},
+			},
+		},
 		"OnlyRefTypeSlice": {
 			args: args{
 				t: types.NewTypeName(token.NoPos, tp, "Params", types.Universe.Lookup("string").Type()),
 				f: &Field{
 					Name: name.NewFromCamel("TestField"),
 					Reference: &config.Reference{
-						Type: "testObject",
+						Types: []string{"testObject"},
 					},
 					FieldType: types.NewSlice(types.Universe.Lookup("string").Type()),
 				},
@@ -88,7 +113,7 @@ func TestBuilder_generateReferenceFields(t *testing.T) {
 				f: &Field{
 					Name: name.NewFromCamel("TestField"),
 					Reference: &config.Reference{
-						Type:         "TestObject",
+						Types:        []string{"TestObject"},
 						RefFieldName: "CustomRef",
 					},
 					FieldType: types.Universe.Lookup("string").Type(),
@@ -114,7 +139,7 @@ func TestBuilder_generateReferenceFields(t *testing.T) {
 				f: &Field{
 					Name: name.NewFromCamel("TestField"),
 					Reference: &config.Reference{
-						Type:              "TestObject",
+						Types:             []string{"TestObject"},
 						SelectorFieldName: "CustomSelector",
 					},
 					FieldType: types.Universe.Lookup("string").Type(),
@@ -140,7 +165,7 @@ func TestBuilder_generateReferenceFields(t *testing.T) {
 				f: &Field{
 					Name: name.NewFromCamel("TestField"),
 					Reference: &config.Reference{
-						Type: "github.com/upbound/official-providers/provider-aws/apis/somepackage/v1beta1.TestObject",
+						Types: []string{"github.com/upbound/official-providers/provider-aws/apis/somepackage/v1beta1.TestObject"},
 					},
 					FieldType: types.Universe.Lookup("string").Type(),
 				},

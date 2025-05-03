@@ -131,8 +131,13 @@ func (rr *Injector) getTypePath(tfName string, configResources map[string]*confi
 func (rr *Injector) SetReferenceTypes(configResources map[string]*config.Resource) error {
 	for _, r := range configResources {
 		for attr, ref := range r.References {
-			if ref.Type == "" && ref.TerraformName != "" {
-				crdTypePath, err := rr.getTypePath(ref.TerraformName, configResources)
+			if ref.TerraformName != "" {
+				ref.TerraformNames = append(ref.TerraformNames, ref.TerraformName)
+			}
+
+			cannotProvideMapping := false
+			for _, tn := range ref.TerraformNames {
+				crdTypePath, err := rr.getTypePath(tn, configResources)
 				if err != nil {
 					return errors.Wrap(err, "cannot set reference types")
 				}
@@ -144,12 +149,21 @@ func (rr *Injector) SetReferenceTypes(configResources map[string]*config.Resourc
 				// compile errors to be fixed by making the types
 				// available to the type mapper.
 				if crdTypePath == "" {
-					delete(r.References, attr)
-					continue
+					cannotProvideMapping = true
 				}
-				ref.Type = crdTypePath
-				r.References[attr] = ref
+				ref.Types = append(ref.Types, crdTypePath)
 			}
+
+			if cannotProvideMapping {
+				delete(r.References, attr)
+				continue
+			}
+
+			if ref.Type != "" {
+				ref.Types = append(ref.Types, ref.Type)
+			}
+
+			r.References[attr] = ref
 		}
 	}
 	return nil

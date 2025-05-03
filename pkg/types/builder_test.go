@@ -364,7 +364,7 @@ func TestBuild(t *testing.T) {
 					},
 					References: map[string]config.Reference{
 						"reference_id": {
-							Type:         "string",
+							Types:        []string{"string"},
 							RefFieldName: "ExternalResourceID",
 						},
 					},

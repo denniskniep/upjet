@@ -177,8 +177,8 @@ type References map[string]Reference
 type Reference struct {
 	// Type is the Go type name of the CRD if it is in the same package or
 	// <package-path>.<type-name> if it is in a different package.
-	// Deprecated: Type is deprecated in favor of TerraformName, which provides
-	// a more stable and less error-prone API compared to Type. TerraformName
+	// Deprecated: Type is deprecated in favor of TerraformNames, which provides
+	// a more stable and less error-prone API compared to Type. TerraformNames
 	// will automatically handle name & version configurations that will affect
 	// the generated cross-resource reference. This is crucial especially if the
 	// provider generates multiple versions for its MR APIs.
@@ -187,7 +187,22 @@ type Reference struct {
 	// which will be referenced. The supplied resource name is
 	// converted to a type name of the corresponding CRD using
 	// the configured TerraformTypeMapper.
+	// Deprecated: TerraformName is deprecated in favor of TerraformNames, which provides
+	// the capability to set multiple names
 	TerraformName string
+	// Types contains the Go type name of the CRD if it is in the same package or
+	// <package-path>.<type-name> if it is in a different package.
+	// Deprecated: Types is deprecated in favor of TerraformNames, which provides
+	// a more stable and less error-prone API compared to Type. TerraformNames
+	// will automatically handle name & version configurations that will affect
+	// the generated cross-resource reference. This is crucial especially if the
+	// provider generates multiple versions for its MR APIs.
+	Types []string
+	// TerraformName is the name of the Terraform resource
+	// which will be referenced. The supplied resource name is
+	// converted to a type name of the corresponding CRD using
+	// the configured TerraformTypeMapper.
+	TerraformNames []string
 	// Extractor is the function to be used to extract value from the
 	// referenced type. Defaults to getting external name.
 	// Optional

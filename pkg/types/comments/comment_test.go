@@ -109,7 +109,7 @@ yes, this is a test`,
 				opts: []Option{
 					WithTFTag("-"),
 					WithReferenceConfig(config.Reference{
-						Type: reflect.TypeOf(Comment{}).String(),
+						Types: []string{reflect.TypeOf(Comment{}).String()},
 					}),
 				},
 			},
@@ -124,7 +124,7 @@ yes, this is a test`,
 					},
 					CrossplaneOptions: markers.CrossplaneOptions{
 						Reference: config.Reference{
-							Type: "comments.Comment",
+							Types: []string{"comments.Comment"},
 						},
 					},
 				},

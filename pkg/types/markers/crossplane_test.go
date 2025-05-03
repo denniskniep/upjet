@@ -14,7 +14,7 @@ import (
 
 func TestCrossplaneOptions_String(t *testing.T) {
 	type args struct {
-		referenceToType            string
+		referenceToTypes           []string
 		referenceExtractor         string
 		referenceFieldName         string
 		referenceSelectorFieldName string
@@ -28,7 +28,7 @@ func TestCrossplaneOptions_String(t *testing.T) {
 	}{
 		"NoOption": {
 			args: args{
-				referenceToType: "",
+				referenceToTypes: []string{},
 			},
 			want: want{
 				out: "",
@@ -36,7 +36,7 @@ func TestCrossplaneOptions_String(t *testing.T) {
 		},
 		"WithType": {
 			args: args{
-				referenceToType: "SecurityGroup",
+				referenceToTypes: []string{"SecurityGroup"},
 			},
 			want: want{
 				out: "+crossplane:generate:reference:type=SecurityGroup\n",
@@ -44,7 +44,7 @@ func TestCrossplaneOptions_String(t *testing.T) {
 		},
 		"WithAll": {
 			args: args{
-				referenceToType:            "github.com/crossplane/provider-aws/apis/ec2/v1beta1.Subnet",
+				referenceToTypes:           []string{"github.com/crossplane/provider-aws/apis/ec2/v1beta1.Subnet"},
 				referenceExtractor:         "github.com/crossplane/provider-aws/apis/ec2/v1beta1.SubnetARN()",
 				referenceFieldName:         "SubnetIDRefs",
 				referenceSelectorFieldName: "SubnetIDSelector",
@@ -62,7 +62,7 @@ func TestCrossplaneOptions_String(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			o := CrossplaneOptions{
 				Reference: config.Reference{
-					Type:              tc.referenceToType,
+					Types:             tc.referenceToTypes,
 					Extractor:         tc.referenceExtractor,
 					RefFieldName:      tc.referenceFieldName,
 					SelectorFieldName: tc.referenceSelectorFieldName,

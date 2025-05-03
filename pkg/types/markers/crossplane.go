@@ -30,8 +30,8 @@ type CrossplaneOptions struct {
 func (o CrossplaneOptions) String() string {
 	m := ""
 
-	if o.Type != "" {
-		m += fmt.Sprintf("%s%s\n", markerPrefixRefType, o.Type)
+	for _, typ := range o.Types {
+		m += fmt.Sprintf("%s%s\n", markerPrefixRefType, typ)
 	}
 	if o.Extractor != "" {
 		m += fmt.Sprintf("%s%s\n", markerPrefixRefExtractor, o.Extractor)

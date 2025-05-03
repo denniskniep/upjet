@@ -66,16 +66,16 @@ func (g *Builder) generateReferenceFields(t *types.TypeName, f *Field) (fields [
 
 	var tr types.Type
 	tr = types.NewPointer(typeReferenceField)
-	refComment := fmt.Sprintf("// Reference to a %s to populate %s.\n%s",
-		friendlyTypeDescription(f.Reference.Type), f.Name.LowerCamelComputed, commentOptional.Build())
-	selComment := fmt.Sprintf("// Selector for a %s to populate %s.\n%s",
-		friendlyTypeDescription(f.Reference.Type), f.Name.LowerCamelComputed, commentOptional.Build())
+	refComment := fmt.Sprintf("// Reference to %s to populate %s.\n%s",
+		friendlyTypeDescription(f.Reference.Types, "a "), f.Name.LowerCamelComputed, commentOptional.Build())
+	selComment := fmt.Sprintf("// Selector for %s to populate %s.\n%s",
+		friendlyTypeDescription(f.Reference.Types, "a "), f.Name.LowerCamelComputed, commentOptional.Build())
 	if isSlice {
 		tr = types.NewSlice(typeReferenceField)
 		refComment = fmt.Sprintf("// References to %s to populate %s.\n%s",
-			friendlyTypeDescription(f.Reference.Type), f.Name.LowerCamelComputed, commentOptional.Build())
+			friendlyTypeDescription(f.Reference.Types, ""), f.Name.LowerCamelComputed, commentOptional.Build())
 		selComment = fmt.Sprintf("// Selector for a list of %s to populate %s.\n%s",
-			friendlyTypeDescription(f.Reference.Type), f.Name.LowerCamelComputed, commentOptional.Build())
+			friendlyTypeDescription(f.Reference.Types, ""), f.Name.LowerCamelComputed, commentOptional.Build())
 	}
 	ref := types.NewField(token.NoPos, g.Package, rfn.Camel, tr, false)
 	sel := types.NewField(token.NoPos, g.Package, sfn.Camel, types.NewPointer(typeSelectorField), false)
@@ -96,12 +96,22 @@ func TypePath(i any) string {
 	return reflect.TypeOf(i).PkgPath() + "." + reflect.TypeOf(i).Name()
 }
 
-func friendlyTypeDescription(path string) string {
-	if !strings.Contains(path, ".") {
-		return path
+func friendlyTypeDescription(paths []string, article string) string {
+	result := ""
+	for _, path := range paths {
+
+		if result != "" {
+			result += " or "
+		}
+
+		if !strings.Contains(path, ".") {
+			result += fmt.Sprintf("%s%s", article, path)
+			continue
+		}
+		typeName := path[strings.LastIndex(path, ".")+1:]
+		dirs := strings.Split(path, "/")
+		groupName := dirs[len(dirs)-2]
+		result += fmt.Sprintf("%s%s in %s", article, typeName, groupName)
 	}
-	typeName := path[strings.LastIndex(path, ".")+1:]
-	dirs := strings.Split(path, "/")
-	groupName := dirs[len(dirs)-2]
-	return fmt.Sprintf("%s in %s", typeName, groupName)
+	return result
 }
